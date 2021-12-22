@@ -1,0 +1,5 @@
+@startuml
+ A -> B: Operate
+ B -> C: Operate
+ C -> D: Operate
+@enduml
