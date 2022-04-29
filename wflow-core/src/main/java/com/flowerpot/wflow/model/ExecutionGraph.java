@@ -7,7 +7,7 @@ package com.flowerpot.wflow.model;
  * @author Mrhan
  * @date 2021/12/21 17:42
  */
-public interface ExecutionGraph {
+public interface ExecutionGraph extends PipelineCycle<Object> {
 
     /**
      * 注册管道
@@ -17,6 +17,11 @@ public interface ExecutionGraph {
      */
     void registerPipeline(String name, Pipeline<?> pipeline);
 
+    /**
+     * 绑定入口管道
+     * @param name 名称
+     */
+    void bindEntrancePipeline(String name);
     /**
      * 导流，把指定管道的数据导向另一个管道
      *
@@ -47,10 +52,8 @@ public interface ExecutionGraph {
     <T> void addFilter(String pipelineName, Filter<T> filter);
 
     /**
-     * 输入数据
-     * @param pipelineName  管道名称
-     * @param data  输入的数据
-     * @param <T>   输入数据的泛型
+     * 获取状态
+     * @return 状态
      */
-    <T> void input(String pipelineName, T data);
+    PipelineStatus getStatus();
 }

@@ -6,10 +6,9 @@ package com.flowerpot.wflow.model;
  * @author Mrhan
  * @date 2021/12/21 16:06
  */
-@FunctionalInterface
 public interface OperateContext<T> {
     /**
-     * 输入数据
+     * 处理数据
      * @param data 输入数据
      */
     void input(T data);

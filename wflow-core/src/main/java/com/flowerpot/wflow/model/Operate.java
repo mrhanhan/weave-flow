@@ -15,5 +15,5 @@ public interface Operate<IN, OUT> {
      * @param data 返回数据
      * @param context 操作上下文。有些时候
      */
-    void operate(IN data, OperateContext<OUT> context);
+    void operate(IN data, PipelineCycle<OUT> context);
 }

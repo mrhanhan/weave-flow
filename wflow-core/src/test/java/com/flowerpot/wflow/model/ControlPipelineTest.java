@@ -25,7 +25,7 @@ public class ControlPipelineTest {
 
         executorService.submit(() -> {
            while (!Thread.interrupted()) {
-               numberPipeline.getControl().pause();
+               numberPipeline.pause();
                System.out.println("开始暂停");
                try {
                    Thread.sleep(3000);
@@ -33,7 +33,7 @@ public class ControlPipelineTest {
                    e.printStackTrace();
                }
                System.out.println("恢复操作");
-               numberPipeline.getControl().resume();
+               numberPipeline.resume();
            }
         });
 

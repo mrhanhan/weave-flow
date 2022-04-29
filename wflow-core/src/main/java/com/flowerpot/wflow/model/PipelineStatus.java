@@ -12,11 +12,31 @@ public enum PipelineStatus {
      */
     RUNNING,
     /**
+     * 初始化中
+     */
+    INITIALIZING,
+    /**
+     * 回复中
+     */
+    RESUMING,
+    /**
+     * 暂停中
+     */
+    PAUSING,
+    /**
      * 暂停的状态
      */
     PAUSED,
     /**
+     * 停止中
+     */
+    STOPPING,
+    /**
      * 停止的状态
      */
-    STOP
+    STOP,
+    /**
+     * 结束
+     */
+    FINISH
 }

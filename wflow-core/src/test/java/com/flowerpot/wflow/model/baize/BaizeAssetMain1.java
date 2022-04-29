@@ -116,11 +116,12 @@ public class BaizeAssetMain1 {
         defaultExecutionGraph.addSink("vul", data -> {
             System.out.println("Web 漏洞存入数据库");
         });
-
+        defaultExecutionGraph.start();
         Scanner scanner = new Scanner(System.in);
         while (!Thread.interrupted()) {
             System.out.println("请输入需要检测的目标:");
             defaultExecutionGraph.input("entrance", scanner.nextLine());
         }
+
     }
 }

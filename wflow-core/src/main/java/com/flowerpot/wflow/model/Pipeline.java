@@ -15,19 +15,19 @@ package com.flowerpot.wflow.model;
  * @author Mrhan
  * @date 2021/12/21 15:34
  */
-public interface Pipeline<T> {
+public interface Pipeline<T> extends PipelineCycle<T>{
 
     /**
      * 获取管道名称
      * @return 返回管道名称
      */
     String getName();
-    /**
-     * 数据输入的功能
-     * @param data 输入的数据
-     */
-    void input(T data);
 
+    /**
+     * 获取状态
+     * @return 获取状态
+     */
+    PipelineStatus getStatus();
     /**
      * 在当前管道创建新的分支
      * @param operate   管道数据
@@ -35,7 +35,7 @@ public interface Pipeline<T> {
      * @param <D>  输出数据
      * @param <C>  操作上下文
      */
-    <D, C extends OperateContext<D>> void branch(Operate<T, D> operate, C context);
+    <D, C extends PipelineCycle<D>> void branch(Operate<T, D> operate, C context);
 
     /**
      * 在当前管道创建新的分支
@@ -46,7 +46,7 @@ public interface Pipeline<T> {
      * @return  返回信的管道分支
      */
     default <D, P extends Pipeline<D>> P branch(Operate<T, D> operate, P pipeline) {
-        this.branch(operate, (OperateContext<D>)pipeline::input);
+        this.branch(operate, (PipelineCycle<D>)pipeline);
         return pipeline;
     }
 
@@ -62,9 +62,4 @@ public interface Pipeline<T> {
      */
     void addFilter(Filter<T> filter);
 
-    /**
-     * 获取管道控制器
-     * @return 返回管道控制器
-     */
-    PipelineControl getControl();
 }

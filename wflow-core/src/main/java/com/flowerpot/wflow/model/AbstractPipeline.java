@@ -17,6 +17,11 @@ public class AbstractPipeline<T> implements Pipeline<T>{
     @Setter
     @Getter
     private String name;
+
+    @Getter
+    @Setter
+    private PipelineStatus status;
+
     /**
      * 控制器
      */
@@ -33,31 +38,60 @@ public class AbstractPipeline<T> implements Pipeline<T>{
      * 数据容器
      */
     private DataContainer<T> dataContainer;
-    /**
-     * 管道的控制
-     */
-    private PipelineControl control;
+
 
     public AbstractPipeline() {
         filterChain.setFinalFilter(this::finalFilter);
         dataContainer = new DefaultDataContainer<>();
-        control = new DefaultPipelineControl<T>(this);
+    }
+
+    @Override
+    public void start() {
+        status = PipelineStatus.RUNNING;
     }
 
     @Override
     public void input(T data) {
         // 判断管道是否是暂停了
-        if (this.control.getStatus() == PipelineStatus.PAUSED) {
+        if (this.getStatus() == PipelineStatus.PAUSED || this.getStatus() == PipelineStatus.PAUSING) {
             this.dataContainer.put(data);
-        } else if (this.control.getStatus() == PipelineStatus.RUNNING) {
+        } else if (this.getStatus() == PipelineStatus.RUNNING) {
             // 过滤器过滤数据
             this.filterChain.filter(data, this);
         }
     }
 
     @Override
+    public void pause() {
+        status = PipelineStatus.PAUSED;
+    }
+
+    @Override
+    public void resume() {
+        status = PipelineStatus.RESUMING;
+        // 读取数据
+        while (this.dataContainer.getSize() > 0) {
+            // 处理数据
+            input(this.dataContainer.pop());
+        }
+        status = PipelineStatus.RUNNING;
+    }
+
+    @Override
+    public void stop() {
+        this.status = PipelineStatus.STOP;
+        this.dataContainer.clear();
+    }
+
+    @Override
+    public void finish() {
+        this.status = PipelineStatus.FINISH;
+        // TODO 上级节点如果处理完数据和会调用子节点
+    }
+
+    @Override
     @SuppressWarnings("all")
-    public <D, C extends OperateContext<D>> void branch(Operate<T, D> operate, C context) {
+    public <D, C extends PipelineCycle<D>> void branch(Operate<T, D> operate, C context) {
         OperateBindPipeline<T, D> operateBindPipeline = new OperateBindPipeline<>();
         operateBindPipeline.operate = operate;
         operateBindPipeline.context = context;
@@ -75,14 +109,6 @@ public class AbstractPipeline<T> implements Pipeline<T>{
         filterChain.addFilter(filter);
     }
 
-    @Override
-    public PipelineControl getControl() {
-        return control;
-    }
-
-    public void setControl(PipelineControl control) {
-        this.control = control;
-    }
     /**
      * 最终过滤器
      * @param data      数据
@@ -111,6 +137,6 @@ public class AbstractPipeline<T> implements Pipeline<T>{
 
     private static class OperateBindPipeline<IN, OUT> {
         private Operate<IN, OUT> operate;
-        private OperateContext<OUT> context;
+        private PipelineCycle<OUT> context;
     }
 }
